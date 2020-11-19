@@ -13,6 +13,7 @@ library(janitor)
 library(here)
 library(kableExtra)
 library(ggbeeswarm)
+library(effsize)
 ```
 
 
@@ -45,12 +46,69 @@ ggplot() + geom_col(data = hares_counts,aes(x = year, y = n), fill= "cadetblue4"
 ### Visualize Juvenile Hare Weights
 
 ```{r}
+hare_data <- hares %>% 
+  filter(age == "j") 
+
 ggplot() +
-  geom_beeswarm(data = hares, 
+  geom_beeswarm(data = hare_data, 
                 aes(x = sex, 
                     y = weight, color = grid))+
                   facet_wrap(~grid)+
   scale_color_manual(values = c("goldenrod2", "lightblue", "olivedrab"))
 
+```
+
+
+```{r}
+
+
+ggplot() +
+  geom_beeswarm(data = hare_data, 
+                aes(x = sex, 
+                    y = weight, color = sex))+labs(x="Sex", y="Weight of Juveniles")+
+  theme_minimal()
+ggplot() +
+  geom_beeswarm(data = hare_data, 
+                aes(x = grid, 
+                    y = weight, color = grid))+labs(x="Grid", y="Weight of Juveniles")+
+  theme_minimal()
+ 
+
+```
+```{r}
+
+
+hares_summary <- hare_data %>% 
+  
+  group_by(sex) %>% 
+  summarize(
+    mean_weight = mean(weight, na.rm = TRUE),
+    sd_weight = sd(weight, na.rm = TRUE),
+    sample_size = n(),
+  
+  )
+
+hares_summary
+```
+```{r}
+hares_new <- hare_data %>% 
+  select("sex","weight")
+
+hares_f <- hares_new %>% 
+  filter(sex == "f") %>% 
+  pull(weight)
+
+hares_m <- hares_new %>% 
+  filter(sex == "m") %>% 
+  pull(weight)
+```
+
+
+```{r}
+t.test(x = hares_f, y = hares_m)
+
+```
+```{r}
+cohen.d(hares_f, hares_m, na.rm = TRUE)
 ```
 
