@@ -14,6 +14,7 @@ library(here)
 library(kableExtra)
 library(ggbeeswarm)
 library(effsize)
+library(broom)
 ```
 
 
@@ -47,7 +48,9 @@ ggplot() + geom_col(data = hares_counts,aes(x = year, y = n), fill= "cadetblue4"
 
 ```{r}
 hare_data <- hares %>% 
-  filter(age == "j") 
+  filter(age == "j") %>% 
+  select("sex","grid","weight")
+
 
 ggplot() +
   geom_beeswarm(data = hare_data, 
@@ -102,6 +105,15 @@ hares_m <- hares_new %>%
   filter(sex == "m") %>% 
   pull(weight)
 ```
+```{r}
+ggplot(data = hare_data, aes(x = weight)) +
+  geom_histogram(bins = 15) +
+  facet_wrap(~sex)
+
+ggplot(data = hare_data, aes(sample = weight)) +
+  geom_qq() +
+  facet_wrap(~sex)
+```
 
 
 ```{r}
@@ -112,3 +124,35 @@ t.test(x = hares_f, y = hares_m)
 cohen.d(hares_f, hares_m, na.rm = TRUE)
 ```
 
+## Part 4:Relationship between Juvenile Weight & Hind Foot Lenth 
+```{r}
+hare_foot <- hares %>% 
+ filter(age == "j")
+
+ggplot(data = hare_foot, aes(x = weight, y = hindft)) +
+  geom_jitter(color = "darkslategray4",size = 2, 
+              alpha = 0.6,
+              width = 0.1,
+              show.legend = FALSE)+
+   geom_smooth(method = "lm",
+              color = "black",
+              size = 0.5,
+              fill = "gray10",
+              alpha = 0.5) +
+  theme_light() +
+  ggpubr::stat_regline_equation(label.x = 1300, label.y = 100)
+  
+
+```
+```{r}
+hares_cor <- cor.test(hare_foot$weight, hare_foot$hindft)
+
+hares_cor
+```
+moderate correlation 
+```{r}
+hares_lm <- lm(weight ~ hindft, data = hare_foot)
+
+summary(hares_lm)
+```
+The Multiple R^2^ value is 0.2988 - meaning that 29.88% of variance in hindfoot length is explained by weight.
