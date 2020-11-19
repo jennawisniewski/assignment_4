@@ -1,0 +1,56 @@
+---
+title: "Assignment 4"
+author: "Jenna Wisniewski"
+date: "11/17/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(lubridate)
+library(janitor)
+library(here)
+library(kableExtra)
+library(ggbeeswarm)
+```
+
+
+```{r}
+hares <- read_csv(here("data","bonanza_hares.csv"))
+```
+## 1.Introduction 
+This study is yada yada yada
+
+## 2.Data and Analyses
+here is the data yo
+
+## 3.Exploratory Findings
+
+### A. Annual Juvenile Hare Trap Counts
+```{r}
+hares_counts <- hares %>% 
+  mutate(date = mdy(date), .keep = 'unused') %>% 
+  mutate(year = year(date)) %>% 
+  filter(age == "j") %>% 
+   count(year)
+
+ggplot() + geom_col(data = hares_counts,aes(x = year, y = n), fill= "cadetblue4") + scale_x_continuous(breaks = c(1999, 2001, 2003, 2005, 2007, 2009, 2011))+labs(x="Year", y="Number of juvenile hare trappings")+
+  theme_minimal()
+
+
+```
+(Figure 1)Number of juvenile hares trapped each year
+
+### Visualize Juvenile Hare Weights
+
+```{r}
+ggplot() +
+  geom_beeswarm(data = hares, 
+                aes(x = sex, 
+                    y = weight, color = grid))+
+                  facet_wrap(~grid)+
+  scale_color_manual(values = c("goldenrod2", "lightblue", "olivedrab"))
+
+```
+
