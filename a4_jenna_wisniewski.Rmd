@@ -49,6 +49,8 @@ ggplot() + geom_col(data = hares_counts,aes(x = year, y = n), fill= "cadetblue4"
 
 **Figure 1.** Total number of trapped juvenile Snowshoe hares at Bonanza Creek from years 1999 to 2012, excluding 2002 and 2009. Data: Kielland et. al.(2017)
 
+The graph shows a higher amount of trapping in earlier years. The first year, 1999, had the maximum count if 126. The minimum count was in 2010 with 2 trappings. The mean number of counts for all years was 31.5. In order to standardize the count of this population in future analyses, the same number of traps should be set for the same number of days each year. 
+
 ### b.Visualize Juvenile Hare Weights
 
 ```{r}
@@ -77,12 +79,21 @@ ggplot(data = hare_data, aes(x = sex, y = weight, na.rm = TRUE)) +
 
 
 **Figure 2** Weight observations (gm) for juvenile snowshoe hares by sex and at the three different grid sites(bons, bonmat, and bonrip). Gold (bons), blue (bonmat) and green (bonrip) points indicate individual observations weight (grams) of an juvenile snowshoe hares by sex. Box endpoints indicate the 25^th^ and 75^th^ percentile values; the black line and black point within the box indicate the median and mean value for each species, respectively. Data: Kielland et. al.(2017).
-### c. Juvenile Weight Comparison
 
 
+
+Distribution of weight for all three sites was relatively normal and symmetric, however it looks like more data is needed, especially in the bons and bonmat to further determine this. Across all sites, the male snowshoe hare's weight has both a higher median and mean. The juvenile hares at the bonbs site have a higher mean and median than the other sites, the bonmat and bonrip sites have very close means when comparing males and females. 
+
+
+
+### c.Juvenile Weight Comparison
+
+
+**Table 1** Descriptive statistics (mean, standard deviation, and sample size) for the weight(grams) across sex in juvenile snowshoe hares Data: Kielland et. al.(2017).
 ```{r}
-
 ##I am creating a summary table which will give me the mean, standard deviation, and sample size of the weight of the hares in relation to each sex. 
+
+
 hares_summary <- hare_data %>% 
   
   group_by(sex) %>% 
@@ -96,21 +107,24 @@ hares_summary %>%
   kable(col.names = c("Sex", "Mean Weight (gm)", "Standard Deviation (gm)", "Sample size")) %>% 
   kable_styling(bootstrap_options = "striped", full_width = FALSE)
 
-
 ```
 
-```{r}
-##Creating exploratory graphs to see if the weights for male, female, and N/A are normally distributed so that I may perfrom statistical tests with them. 
+Weight (all in grams) was compared across female and male trapped juveile snowshoe hares.  As expected and consistent with other studies, male hares had a heavier mean weight (`r hares_summary[2,2]` $\pm$ `r hares_summary[2,3]` mm, *n* = `r hares_summary[2,3]`; mean $\pm$ 1 standard deviation), compared to female hares (`r hares_summary[1,2]` $\pm$ `r hares_summary[1,3]` mm, *n* = `r hares_summary[1,4]`)(Table 1).
+
+```{r, include= FALSE}
+##Creating exploratory graphs to see if the weights for male, female, and N/A are normally distributed so that I may perform statistical tests with them. 
 
 ggplot(data = hare_data, aes(x = weight)) +
   geom_histogram(bins = 15) +
   facet_wrap(~sex)
 
+##The data appears to be fairly normally distributed (bell shaped) across male and female
+
 ggplot(data = hare_data, aes(sample = weight)) +
   geom_qq() +
   facet_wrap(~sex)
+##The data looks fairly linear. This linearity and the normal distribution seen in the histogram allow us to continue to run a t.test
 
-##The data appears to be fairly normally distributed 
 ```
 
 
@@ -130,12 +144,12 @@ hares_m <- hares_new %>%
 ```
 
 
-```{r}
+```{r, include = FALSE}
 ##A two sided t.test to compare the mean weights of male and female juvenile hares. 
 t.test(x = hares_f, y = hares_m)
 
 ```
-```{r}
+```{r, include = FALSE}
 ## Completing a cohen.d test to examine the difference between the variance of points
 cohen.d(hares_f, hares_m, na.rm = TRUE)
 ```
@@ -162,14 +176,14 @@ ggplot(data = hare_foot, aes(x = weight, y = hindft)) +
   
 
 ```
-```{r}
+```{r, include = FALSE}
 ##Performing a Pearson's correlation tests between weight and hind foot size
 hares_cor <- cor.test(hare_foot$weight, hare_foot$hindft)
 
 hares_cor
 ```
 moderate correlation 
-```{r}
+```{r, include = FALSE}
 ## Retrieving the R-squared value
 hares_lm <- lm(weight ~ hindft, data = hare_foot)
 
